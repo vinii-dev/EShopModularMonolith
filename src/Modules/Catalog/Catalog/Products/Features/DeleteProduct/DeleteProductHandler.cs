@@ -11,7 +11,7 @@ public class DeleteProductCommandValidator : AbstractValidator<DeleteProductComm
     {
         RuleFor(x => x.ProductId)
             .NotEmpty()
-            .WithMessage("Produt Id is required");
+            .WithMessage("Product Id is required");
     }
 }
 
@@ -23,9 +23,7 @@ internal class DeleteProductHandler(CatalogDbContext dbContext)
         var product = await dbContext.Products.FindAsync([command.ProductId], cancellationToken: cancellationToken);
 
         if (product == null)
-        {
-            throw new Exception($"Product not found: {command.ProductId}");
-        }
+            throw new ProductNotFoundException(command.ProductId);
 
         dbContext.Products.Remove(product);
         await dbContext.SaveChangesAsync(cancellationToken);

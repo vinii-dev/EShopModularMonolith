@@ -1,4 +1,6 @@
-﻿namespace Catalog.Products.Features.UpdateProduct;
+﻿using Catalog.Products.Exceptions;
+
+namespace Catalog.Products.Features.UpdateProduct;
 
 public record UpdateProductCommand(ProductDto Product)
     : ICommand<UpdateProductResult>;
@@ -34,9 +36,7 @@ internal class UpdateProductHandler(CatalogDbContext dbContext)
             .FindAsync([command.Product.Id], cancellationToken: cancellationToken);
 
         if (product is null)
-        {
-            throw new Exception($"Product not found: {command.Product.Id}");
-        }
+            throw new ProductNotFoundException(command.Product.Id);
 
         UpdateProductWithNewValues(product, command.Product);
 
@@ -46,7 +46,7 @@ internal class UpdateProductHandler(CatalogDbContext dbContext)
         return new UpdateProductResult(true);
     }
 
-    private void UpdateProductWithNewValues(Product product, ProductDto productDto)
+    private static void UpdateProductWithNewValues(Product product, ProductDto productDto)
     {
         product.Update(
             productDto.Name,
