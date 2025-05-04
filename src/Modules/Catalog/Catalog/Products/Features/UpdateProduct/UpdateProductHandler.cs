@@ -33,10 +33,8 @@ internal class UpdateProductHandler(CatalogDbContext dbContext)
     public async Task<UpdateProductResult> Handle(UpdateProductCommand command, CancellationToken cancellationToken)
     {
         var product = await dbContext.Products
-            .FindAsync([command.Product.Id], cancellationToken: cancellationToken);
-
-        if (product is null)
-            throw new ProductNotFoundException(command.Product.Id);
+            .FindAsync([command.Product.Id], cancellationToken: cancellationToken)
+                ?? throw new ProductNotFoundException(command.Product.Id);
 
         UpdateProductWithNewValues(product, command.Product);
 

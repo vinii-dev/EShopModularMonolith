@@ -20,10 +20,8 @@ internal class DeleteProductHandler(CatalogDbContext dbContext)
 {
     public async Task<DeleteProductResult> Handle(DeleteProductCommand command, CancellationToken cancellationToken)
     {
-        var product = await dbContext.Products.FindAsync([command.ProductId], cancellationToken: cancellationToken);
-
-        if (product == null)
-            throw new ProductNotFoundException(command.ProductId);
+        var product = await dbContext.Products.FindAsync([command.ProductId], cancellationToken: cancellationToken)
+            ?? throw new ProductNotFoundException(command.ProductId);
 
         dbContext.Products.Remove(product);
         await dbContext.SaveChangesAsync(cancellationToken);
